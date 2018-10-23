@@ -16,7 +16,7 @@ function SSOBroker(window, url, brokerId, secret, cookieLifetime) {
     this.url = url;
     this.brokerId = brokerId;
     this.secret = secret;
-    this.cookieLifetime = cookieLifetime ? cookieLifetime * 1000 : 0;
+    this.cookieLifetime = cookieLifetime ? cookieLifetime * 1000 : 1000 * 3600; //1 hour default (in milliseconds)
     this.cookieName = null;
     this.token = null;
     this.userInfo = null;
