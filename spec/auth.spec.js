@@ -7,9 +7,9 @@
 const Broker = require('../');
 
 describe('SSO Broker: auth trait', function () {
-    it('should perform login', function() {
+    it('should perform login', function(callback) {
         const broker = new Broker({document: {}}, 'foo', 'bar', 'zoo');
-        const testData = null; 
+        var testData = null;
 
         broker.sendPOSTRequest = function(url, params) {
             return new Promise((resolve, reject) => {
@@ -24,9 +24,14 @@ describe('SSO Broker: auth trait', function () {
 
         const result = broker.login('some_username', 'some_password');
 
-        expect(broker.userInfo).toEqual(testData);
         expect(result instanceof Promise).toBe(true);
-        result.then(response => expect(response).toEqual(testData));
+
+        result.then(response => {
+            expect(broker.userInfo).toEqual(testData);
+            expect(response).toEqual(testData);
+
+            callback();
+        });
     });
 
     it('should perform logout', function() {

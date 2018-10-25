@@ -29,7 +29,7 @@ describe('SSO Broker', function () {
     function initExceptionProvider() {
         return [
             {
-                note: 'should throw if window object is not set', 
+                note: 'should throw if window object is not set',
                 window: null,
                 url: 'bar',
                 brokerId: 'baz',
@@ -37,7 +37,7 @@ describe('SSO Broker', function () {
                 expected: 'Window object is not specified'
             },
             {
-                note: 'should throw if url is not set', 
+                note: 'should throw if url is not set',
                 window: 'foo',
                 url: null,
                 brokerId: 'baz',
@@ -45,7 +45,7 @@ describe('SSO Broker', function () {
                 expected: 'SSO server URL not specified'
             },
             {
-                note: 'should throw if broker id is not set', 
+                note: 'should throw if broker id is not set',
                 window: 'foo',
                 url: 'bar',
                 brokerId: null,
@@ -53,7 +53,7 @@ describe('SSO Broker', function () {
                 expected: 'SSO broker id not specified'
             },
             {
-                note: 'should throw if secret is not set', 
+                note: 'should throw if secret is not set',
                 window: 'foo',
                 url: 'bar',
                 brokerId: 'baz',
@@ -66,14 +66,14 @@ describe('SSO Broker', function () {
     initExceptionProvider().forEach(function(spec) {
         it(spec.note, function() {
             try {
-                const broker = new Broker(spec.window, spec.url, spec.brokerId, spec.secret);                            
+                const broker = new Broker(spec.window, spec.url, spec.brokerId, spec.secret);
             } catch (e) {
                 expect(e).toEqual(spec.expected);
             }
         })
     });
 
-    it('should get userinfo from property, without performing request', function() {
+    it('should get userinfo from property, without performing request', function(callback) {
         const broker = new Broker({document: {}}, 'foo', 'bar', 'zoo');
 
         broker.userInfo = 'test';
@@ -85,12 +85,15 @@ describe('SSO Broker', function () {
 
         expect(result instanceof Promise).toBe(true);
 
-        result.then(userInfo => expect(userInfo).toEqual('test'));
+        result.then(userInfo => {
+            expect(userInfo).toEqual('test');
+            callback();
+        });
     });
 
-    it('should perform request to get userinfom if it is not set as property', function() {
+    it('should perform request to get userinfo if it is not set as property', function() {
         const broker = new Broker({document: {}}, 'foo_url', 'bar', 'zoo');
-        broker.sendRequest = function(options) {
+        broker.sendRequest = function(requestObj, options) {
             return extend(options, {'test': true});
         };
 
@@ -99,7 +102,7 @@ describe('SSO Broker', function () {
         expect(result).toEqual({
             method: 'GET',
             url: 'foo_url?command=userInfo',
-            'test': true
+            test: true
         });
     });
 });
