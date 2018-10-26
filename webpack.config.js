@@ -1,21 +1,18 @@
-var webpack = require('webpack');
-var filename = 'sso-broker.js';
-var plugins = [
-    new webpack.IgnorePlugin(/jsdom/)
-];
+const webpack = require('webpack');
 
 module.exports = function(env) {
-    if (env === 'prod') {
-        filename = 'sso-broker.min.js';
-        plugins.push(new webpack.optimize.UglifyJsPlugin());
-    };
+    const filename = env === 'prod' ? 'sso-broker.min.js' : 'sso-broker.js';
 
     return {
+        mode: env === 'prod' ? 'production' : 'development',
         entry: './index.js',
         output: {
-            path: './assets',
+            path: __dirname + '/assets',
             filename: filename,
             library: 'SSOBroker'
+        },
+        optimization: {
+            minimize: env === 'prod'
         },
         node: {
             fs: "empty",
@@ -23,6 +20,8 @@ module.exports = function(env) {
             child_process: "empty",
             tls: "empty"
         },
-        plugins: plugins
+        plugins: [
+            new webpack.optimize.OccurrenceOrderPlugin()
+        ]
     };
 }
