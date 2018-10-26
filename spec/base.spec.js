@@ -105,4 +105,12 @@ describe('SSO Broker', function () {
             test: true
         });
     });
+
+    it('should append host to url, if it starts with slash', function() {
+        const broker1 = new Broker({location: {hostname: 'www.foo.com'}, document: {}}, 'foo_url', 'bar', 'zoo');
+        const broker2 = new Broker({location: {hostname: 'www.foo.com'}, document: {}}, '/foo_url', 'bar', 'zoo');
+
+        expect(broker1.url).toBe('foo_url');
+        expect(broker2.url).toBe('www.foo.com/foo_url');
+    })
 });

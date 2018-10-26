@@ -4,8 +4,8 @@
  * Unit tests for SSOBroker send-request trait
  */
 
-const request = require('request');
 const Broker = require('../');
+const HttpWrapper = require('../lib/http-wrapper');
 
 describe('SSO Broker: send-request trait', function () {
     it('should preform GET request', function() {
@@ -18,12 +18,10 @@ describe('SSO Broker: send-request trait', function () {
         const params = {'param1': 'val1', 'param2': 'val 2'};
         const result = broker.sendGETRequest('some_url', params);
 
-        expect(result).toEqual({
-            requestObj: request,
-            options: {
-                method: 'GET',
-                url: 'some_url?param1=val1&param2=val%202'
-            }
+        expect(result.requestObj instanceof HttpWrapper).toBe(true);
+        expect(result.options).toEqual({
+            method: 'GET',
+            url: 'some_url?param1=val1&param2=val%202'
         });
     });
 
@@ -37,13 +35,12 @@ describe('SSO Broker: send-request trait', function () {
         const params = {'param1': 'val1', 'param2': 'val 2'};
         const result = broker.sendPOSTRequest('some_url', params);
 
-        expect(result).toEqual({
-            requestObj: request,
-            options: {
-                method: 'POST',
-                url: 'some_url',
-                form: params
-            }
+        expect(result.requestObj instanceof HttpWrapper).toBe(true);
+        expect(result.options).toEqual({
+            method: 'POST',
+            url: 'some_url',
+            form: params,
+            headers : { 'Content-Type' : 'application/x-www-form-urlencoded' }
         });
     });
 
@@ -54,10 +51,12 @@ describe('SSO Broker: send-request trait', function () {
         const passOptions = testOptions['passOptions'];
         const allOptions = testOptions['allOptions'];
 
-        const requestMock = function(options, callback) {
-            expect(options).toEqual(allOptions);
+        const requestMock = {
+            process: function(options, callback) {
+                expect(options).toEqual(allOptions);
 
-            callback('Some error message from server', {statusCode: 403}, null);
+                callback('Some error message from server', {statusCode: 403}, null);
+            }
         };
 
         broker.token = 'some_token';
@@ -83,10 +82,12 @@ describe('SSO Broker: send-request trait', function () {
         const passOptions = testOptions['passOptions'];
         const allOptions = testOptions['allOptions'];
 
-        const requestMock = function(options, callback) {
-            expect(options).toEqual(allOptions);
+        const requestMock = {
+            process: function(options, callback) {
+                expect(options).toEqual(allOptions);
 
-            callback('Some error message from server', {statusCode: 500}, null);
+                callback('Some error message from server', {statusCode: 500}, null);
+            }
         };
 
         broker.token = 'some_token';
@@ -112,11 +113,13 @@ describe('SSO Broker: send-request trait', function () {
         const passOptions = testOptions['passOptions'];
         const allOptions = testOptions['allOptions'];
 
-        const requestMock = function(options, callback) {
-            const headers = {'content-type': 'plain/html'};
+        const requestMock = {
+            process: function(options, callback) {
+                const headers = {'content-type': 'plain/html'};
 
-            expect(options).toEqual(allOptions);
-            callback(null, { headers }, 'some_non_json_body');
+                expect(options).toEqual(allOptions);
+                callback(null, { headers }, 'some_non_json_body');
+            }
         };
 
         broker.token = 'some_token';
@@ -142,11 +145,13 @@ describe('SSO Broker: send-request trait', function () {
         const passOptions = testOptions['passOptions'];
         const allOptions = testOptions['allOptions'];
 
-        const requestMock = function(options, callback) {
-            const headers = {'content-type': 'application/json'};
+        const requestMock = {
+            process: function(options, callback) {
+                const headers = {'content-type': 'application/json'};
 
-            expect(options).toEqual(allOptions);
-            callback(null, { headers }, '{"foo": "bar"}');
+                expect(options).toEqual(allOptions);
+                callback(null, { headers }, '{"foo": "bar"}');
+            }
         };
 
         broker.token = 'some_token';

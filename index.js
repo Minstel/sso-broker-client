@@ -27,9 +27,12 @@ function SSOBroker(window, url, brokerId, secret, cookieLifetime) {
      */
     this.init = function() {
         if (!this.window) throw "Window object is not specified";
-        if (!this.url) throw "SSO server URL not specified";
         if (!this.brokerId) throw "SSO broker id not specified";
         if (!this.secret) throw "SSO broker secret not specified";
+        if (!this.url) throw "SSO server URL not specified";
+        if (this.url.substr(0, 1) === '/') {
+            this.url = this.window.location.hostname + this.url;
+        }
 
         this.useTrait(new CookieTrait());
         this.useTrait(new TokenTrait());
@@ -39,7 +42,7 @@ function SSOBroker(window, url, brokerId, secret, cookieLifetime) {
         this.useTrait(new AuthTrait());
 
         this.cookieName = this.createCookieName();
-        this.token = this.getCookie(this.cookieName);        
+        this.token = this.getCookie(this.cookieName);
     }
 
     /**
@@ -54,13 +57,13 @@ function SSOBroker(window, url, brokerId, secret, cookieLifetime) {
 
     /**
      * Get user info
-     * @return {Promise} 
+     * @return {Promise}
      */
     this.getUserInfo = function() {
         if (this.userInfo) {
             return new Promise((resolve, reject) => {
                 resolve(self.userInfo);
-            });            
+            });
         }
 
         return this.sendGETRequest(this.url, {command: 'userInfo'});
