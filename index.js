@@ -1,5 +1,6 @@
 'use strict'
 
+const Logger = require('./lib/logger');
 const AuthTrait = require('./lib/traits/auth');
 const TokenTrait = require('./lib/traits/token');
 const AttachTrait = require('./lib/traits/attach');
@@ -9,7 +10,7 @@ const SendRequestTrait = require('./lib/traits/send-request');
 
 module.exports = SSOBroker;
 
-function SSOBroker(window, url, brokerId, secret, cookieLifetime) {
+function SSOBroker(window, url, brokerId, secret, cookieLifetime, debug) {
     const self = this;
 
     this.window = window;
@@ -20,6 +21,7 @@ function SSOBroker(window, url, brokerId, secret, cookieLifetime) {
     this.cookieName = null;
     this.token = null;
     this.userInfo = null;
+    this.logger = new Logger(debug);
 
     /**
      * Init broker on creation
@@ -40,6 +42,8 @@ function SSOBroker(window, url, brokerId, secret, cookieLifetime) {
         this.useTrait(new AttachTrait());
         this.useTrait(new SendRequestTrait());
         this.useTrait(new AuthTrait());
+
+        this.log('Debug mode enabled');
 
         this.cookieName = this.createCookieName();
         this.token = this.getCookie(this.cookieName);
@@ -67,6 +71,14 @@ function SSOBroker(window, url, brokerId, secret, cookieLifetime) {
         }
 
         return this.sendGETRequest(this.url, {command: 'userInfo'});
+    }
+
+    /**
+     * Perform debug logging
+     * @param  {mixed} message
+     */
+    this.log = function(message) {
+        this.logger.log(message);
     }
 
     this.init();
