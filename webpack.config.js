@@ -22,6 +22,11 @@ module.exports = function(env) {
         },
         plugins: [
             new webpack.optimize.OccurrenceOrderPlugin()
-        ]
+        ],
+        resolve: {
+            alias: {
+                "request$": "xhr"
+            }
+        }
     };
 }

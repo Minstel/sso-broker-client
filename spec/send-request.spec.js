@@ -5,7 +5,7 @@
  */
 
 const Broker = require('../');
-const HttpWrapper = require('../lib/http-wrapper');
+const XhrRequest = require('../lib/xhr-request');
 
 describe('SSO Broker: send-request trait', function () {
     it('should preform GET request', function() {
@@ -18,7 +18,7 @@ describe('SSO Broker: send-request trait', function () {
         const params = {'param1': 'val1', 'param2': 'val 2'};
         const result = broker.sendGETRequest('some_url', params);
 
-        expect(result.requestObj instanceof HttpWrapper).toBe(true);
+        expect(result.requestObj instanceof XhrRequest).toBe(true);
         expect(result.options).toEqual({
             method: 'GET',
             url: 'some_url?param1=val1&param2=val%202'
@@ -35,7 +35,7 @@ describe('SSO Broker: send-request trait', function () {
         const params = {'param1': 'val1', 'param2': 'val 2'};
         const result = broker.sendPOSTRequest('some_url', params);
 
-        expect(result.requestObj instanceof HttpWrapper).toBe(true);
+        expect(result.requestObj instanceof XhrRequest).toBe(true);
         expect(result.options).toEqual({
             method: 'POST',
             url: 'some_url',
